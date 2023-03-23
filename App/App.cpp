@@ -277,16 +277,16 @@ int SGX_CDECL main(int argc, char *argv[]) {
 
     // show total result
     std::cout << "=== thoughput(operation per seconds) ===" << std::endl;
-    std::cout << "#worker\t\tnormal\t\tenclave" << std::endl;
+    std::cout << "#worker\tnormal\tenclave" << std::endl;
     int count = 0;
     for (int i = 1; i <= 128; i *= 2) {
-        std::cout << i << "\t\t" << normal_result[count]/EXTIME << "\t" << enclave_result[count]/EXTIME << std::endl;
+        std::cout << i << "\t" << normal_result[count]/EXTIME << "\t" << enclave_result[count]/EXTIME << std::endl;
         count++;
     }
 
     std::cout << std::endl;
     std::cout << "=== latency(new/delete) ===" << std::endl;
-    std::cout << "#worker\t\tnormal\t\tenclave" << std::endl;
+    std::cout << "#worker\tnormal\tenclave" << std::endl;
     count = 0;
     for (int i = 1; i <= 128; i *= 2) {
         uint64_t normal_newTime = 0;
@@ -298,8 +298,8 @@ int SGX_CDECL main(int argc, char *argv[]) {
         uint64_t ret1, ret2;
         ecall_getTime(global_eid, &ret1, 0);
         ecall_getTime(global_eid, &ret2, 1);
-        std::cout << i << "\t\t" << 
-            convert2us(normal_newTime/normal_result[count]) << "us/" << convert2us(normal_delTime/normal_result[count]) << "us\t\t" << 
+        std::cout << i << "\t" << 
+            convert2us(normal_newTime/normal_result[count]) << "us/" << convert2us(normal_delTime/normal_result[count]) << "us\t" << 
             convert2us(ret1/enclave_result[count]) << "us/" << convert2us(ret2/enclave_result[count]) << "us" << std::endl;
         count++;
     }
