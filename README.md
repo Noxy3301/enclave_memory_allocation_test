@@ -1,57 +1,71 @@
-# tlibcxx_vector_test
+# enclave_memory_allocation_test
 
 # About
-Intel SGXの開発ツール、SGX SDKに同梱されている独自ライブラリ<vector>に関する性能調査。
+This program evaluates the performance of new operator(dynamic memory allocation) within the enclave provided by Intel SGX.
 
 # How to use
 
 ```
-$ wget https://download.01.org/intel-sgx/latest/linux-latest/distro/ubuntu20.04-server/sgx_linux_x64_sdk_2.17.100.3.bin
-$ chmod 777 sgx_linux_x64_sdk_2.17.100.3.bin
-$ ./sgx_linux_x64_sdk_2.17.100.3.bin
+$ git clone {THIS REPO}
+$ wget https://download.01.org/intel-sgx/latest/linux-latest/distro/ubuntu20.04-server/sgx_linux_x64_sdk_2.19.100.3.bin
+$ chmod 777 sgx_linux_x64_sdk_2.19.100.3.bin
+$ ./sgx_linux_x64_sdk_2.19.100.3.bin
 [yes]
 $ source {ENVIRONMENT-PATH}   // indicated by green text. 
-$ cd tlibcxx_vector_test
+$ cd enclave_memory_allocation_test
 $ make
 $ ./app
 ```
 
-[注意]<br>
-時間計測のためにCPUクロックに基づくTSCを利用しているため、使用しているCPUのクロック周波数にあった数値を`CLOCKS_PER_US`に入れる必要あり。
+# Measurement condition
+- Operation
+    - The new operator is used to acquire the memory area for the `Tuple` object. After the allocation, the allocated memory area is released using delete operator.
+    - Size of `Tuple` object is 48 byte.
+        - TID(Tidword)   : 8 byte
+        - Key(std::string) : 32 byte
+        - Value(int) : 4 byte (padding : 4 byte)
+
+- Number of worker thread
+    - 1,2,4,8,16,32,64,128
+
+- Execution time
+    - 10sec
 
 # Result
-
-[計測条件]<br>
-要素数10,000,000件のvector配列に対して、indexを用いた要素検索(index_loop)とiteratorを用いた要素検索(iterator_loop)を全てのデータに対して昇順に行う。<br>
-上記の処理をenclave内部、外部でそれぞれ10回行い、平均を算出している。<br>
-また、実行時間はクロックカウンタを用いて計測している。<br>
-[計測結果]<br>
-SGX SDKの独自ライブラリの方が、iteratorを用いた配列検索に関して約3倍程度性能が向上していた。<br>
-以下は実行結果の一例である。
+This is an example of the execution result.
 
 ```
-                tlibcxx STL     (STL)/(tlibcxx)
-index_loop:0    20ms    24ms    1.16414
-index_loop:1    23ms    26ms    1.10495
-index_loop:2    21ms    24ms    1.13897
-index_loop:3    21ms    24ms    1.16067
-index_loop:4    22ms    24ms    1.10007
-index_loop:5    20ms    26ms    1.30518
-index_loop:6    20ms    24ms    1.19707
-index_loop:7    20ms    25ms    1.25696
-index_loop:8    20ms    25ms    1.23191
-index_loop:9    20ms    25ms    1.24738
-[average]       21ms    25ms    1.18802
+=== thoughput(operation per seconds) ===
+#worker normal      enclave
+1       10791812    7571865
+2       5963380     1069994
+4       5608810     567033
+8       6400805     464459
+16      7088161     358555
+32      17491951    241753
+64      24548419    181613
+128     40145095    80162
 
-iterator_loop:0 43ms    147ms   3.36403
-iterator_loop:1 43ms    148ms   3.40649
-iterator_loop:2 43ms    151ms   3.47205
-iterator_loop:3 44ms    151ms   3.38393
-iterator_loop:4 44ms    148ms   3.34448
-iterator_loop:5 45ms    148ms   3.23264
-iterator_loop:6 44ms    151ms   3.43313
-iterator_loop:7 45ms    151ms   3.36047
-iterator_loop:8 43ms    153ms   3.49598
-iterator_loop:9 44ms    155ms   3.46518
-[average]       44ms    150ms   3.39504
+=== latency(new/delete) ===
+#worker normal      enclave
+1       6us/0us     8us/8us
+2       11us/0us    60us/59us
+4       12us/0us    113us/111us
+8       10us/0us    138us/136us
+16      9us/0us     179us/176us
+32      3us/0us     266us/261us
+64      2us/0us     354us/347us
+128     1us/0us     803us/788us
 ```
+
+[note] Latency calculation formula is discribed below.<br>
+- (execution time)/(operation count)
+    - execution time
+        - Total execution time of operators(e.g., new, delete). Not thread execution time(EXTIME).
+    - operation count
+        - Total number of operations executed.
+
+# Discussion
+Since the dynamic memory allocation can be performed in parallel, the throughput increases with the number of worker threads. However, as the number of worker threads increased, the throughput within the enclave decreased.
+We observed an overhead of up to 800 times higher with 128 worker threads.
+Therefore, it can be said that parallel dynamic memory allocation inside the enclave is not desirable.
