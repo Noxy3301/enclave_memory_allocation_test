@@ -236,8 +236,9 @@ int SGX_CDECL main() {
 
             // Each iteration involves both a 'new' and a 'delete' operation. 
             // Therefore, calculating the average latency by dividing the total time spent on 'new'/'delete' operations by the total number of iterations is a valid approach.
-            normal_latency_result.emplace_back(normal_total_new_time / normal_total_iteration_counts, 
-                                               normal_total_del_time / normal_total_iteration_counts);
+            normal_latency_result.emplace_back(
+                std::vector<uint64_t> {normal_total_new_time / normal_total_iteration_counts, 
+                                       normal_total_del_time / normal_total_iteration_counts});
         }
 
         // enclave
@@ -282,7 +283,9 @@ int SGX_CDECL main() {
             ecall_getTime(global_eid, &enclave_total_new_time, 0);
             ecall_getTime(global_eid, &enclave_total_del_time, 1);
 
-            encalve_latency_result.emplace_back(enclave_total_new_time / enclave_total, enclave_total_del_time / enclave_total);
+            encalve_latency_result.emplace_back(
+                std::vector<uint64_t> {enclave_total_new_time / enclave_total, 
+                                       enclave_total_del_time / enclave_total});
         }
     }
 
@@ -306,8 +309,10 @@ int SGX_CDECL main() {
 
     for (int i = 1; i <= 128; i *= 2) {
         std::cout << std::left << std::setw(width) << i <<
-            std::left << std::setw(width) << std::to_string(convert2ns(normal_latency_result[count][0])) + "ns/" + std::to_string(convert2ns(normal_latency_result[count][1])) + "ns" << 
-            std::left << std::setw(width) << std::to_string(convert2ns(encalve_latency_result[count][0])) + "ns/"+ std::to_string(convert2ns(encalve_latency_result[count][1])) + "ns" << std::endl;
+        std::left << std::setw(width) << std::to_string(convert2ns(normal_latency_result[count][0])) + "ns/" + 
+                                         std::to_string(convert2ns(normal_latency_result[count][1])) + "ns" << 
+        std::left << std::setw(width) << std::to_string(convert2ns(encalve_latency_result[count][0])) + "ns/"+ 
+                                         std::to_string(convert2ns(encalve_latency_result[count][1])) + "ns" << std::endl;
         count++;
     }
 

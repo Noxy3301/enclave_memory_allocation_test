@@ -5,8 +5,8 @@
  *  128threadよりでかければなんでもいい
  */
 #define MAX_THREAD_NUM 1000
-#define CLOCKS_PER_US 2100
-#define EXTIME 1
+#define CLOCKS_PER_US 2700
+#define EXTIME 10
 
 struct Tidword {
     union {
