@@ -289,9 +289,9 @@ int SGX_CDECL main() {
         }
     }
 
-    // show thoughput
+    // show throughput
     int width = 12;
-    std::cout << "=== thoughput(operation per seconds) ===" << std::endl;
+    std::cout << "=== throughput(operation per seconds) ===" << std::endl;
     std::cout << std::left << std::setw(width) << "#worker" << std::left << std::setw(width) << "normal" << std::left << std::setw(width) << "enclave" << std::endl;
     int count = 0;
     

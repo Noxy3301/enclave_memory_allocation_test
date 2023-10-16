@@ -41,7 +41,7 @@ This is an example of the execution result.
 | **Total Physical/logical cores** | 64/128 |
 
 ```
-=== thoughput(operation per seconds) ===
+=== throughput(operation per seconds) ===
 #worker     normal      enclave
 1           10157041    7206712
 2           13448659    2302767
@@ -627,7 +627,7 @@ thread #126:    19201 times
 thread #127:    13268 times
 total:  7830259 times
 
-=== thoughput(operation per seconds) ===
+=== throughput(operation per seconds) ===
 #worker     normal      enclave
 1           10157041    7206712
 2           13448659    2302767
