@@ -105,17 +105,23 @@ void ecall_worker(int thid) {
     while (!__atomic_load_n(&start, __ATOMIC_ACQUIRE)) continue;
     
     while (!__atomic_load_n(&quit, __ATOMIC_ACQUIRE)) {
+        // memory allocation using new
         uint64_t startTime1 = rdtscp();
         Tuple *temp = new Tuple("test", 0);
         uint64_t endTime1 = rdtscp();
+
+        // some process
         temp->init();
+
+        // memory deallocation using delete
         uint64_t startTime2 = rdtscp();
         delete temp;
         uint64_t endTime2 = rdtscp();
+
+        // result
         result[thid]++;
         newTime += (endTime1 - startTime1);
         delTime += (endTime2 - startTime2);
-        // printf("%ld %ld\n", endTime1 - startTime1, endTime2 - startTime2);
     }
     newTimes[thid] = newTime;
     delTimes[thid] = delTime;

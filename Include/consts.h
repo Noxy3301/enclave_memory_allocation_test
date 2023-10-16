@@ -6,7 +6,7 @@
  */
 #define MAX_THREAD_NUM 1000
 #define CLOCKS_PER_US 2100
-#define EXTIME 10
+#define EXTIME 1
 
 struct Tidword {
     union {
