@@ -652,11 +652,11 @@ total:  7830259 times
 </details>
 
 
-[note] Latency calculation formula is discribed below.<br>
-- (execution time)/(operation count)
-    - execution time
-        - Total execution time of operators(e.g., new, delete). Not thread execution time(EXTIME).
-    - operation count
+[note] The latency is calculated using the following formula:<br>
+- (Total execution time of operations)/(Total number of executed operations)
+    - Total execution time of operations
+        - Total execution time of operations (e.g., new, delete), not the overall thread execution time (EXTIME).
+    - Total number of executed operations
         - Total number of operations executed.
 
 # Discussion
